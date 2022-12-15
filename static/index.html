@@ -96,11 +96,21 @@
         }
     </script> -->
 
+    <style>
+        #label-container {
+            margin: 0 0 50 50;
+        }
+    </style>
     <div>Teachable Machine Pose Model</div>
     <button type="button" onclick="init()">Start</button>
     <button type="button" onclick="stop()">Stop</button>
-    <div><canvas id="canvas"></canvas></div>
-    <div id="label-container"></div>
+    <div>
+        <div style="display: flex;">
+
+            <div id="label-container" style="position: absolute; color: white; background-color: black; "></div>
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
     <script type="text/javascript">
@@ -135,7 +145,11 @@
             ctx = canvas.getContext("2d");
             labelContainer = document.getElementById("label-container");
             for (let i = 0; i < maxPredictions; i++) { // and class labels
-                labelContainer.appendChild(document.createElement("div"));
+                if (maxPredictions) {
+
+                    labelContainer.appendChild(document.createElement("div"));
+                }
+                console.log(maxPredictions);
             }
         }
 
@@ -153,9 +167,12 @@
             const prediction = await model.predict(posenetOutput);
 
             for (let i = 0; i < maxPredictions; i++) {
-                const classPrediction =
-                    prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-                labelContainer.childNodes[i].innerHTML = classPrediction;
+                // const classPrediction = prediction[i].className + ": " + (prediction[i].probability *100).toFixed(2);
+                const classPrediction = prediction[i].className;
+                if (prediction[i].probability > 0.5) {
+                    labelContainer.innerHTML = classPrediction;
+                }
+
             }
 
             // finally draw the poses
@@ -173,7 +190,7 @@
                 }
             }
         }
-        stop = () =>{
+        stop = () => {
             webcam.stop()
         }
     </script>
